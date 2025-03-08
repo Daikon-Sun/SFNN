@@ -1,0 +1,72 @@
+import argparse
+import torch
+from experiments.exp_long_term_forecasting import Exp_Long_Term_Forecast
+import random
+import numpy as np
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='SFNN')
+
+    # basic config
+    parser.add_argument('--model_id', type=str, required=True, help='model id')
+    parser.add_argument('--model', type=str, required=True)
+
+    # data loader
+    parser.add_argument('--data', type=str, required=True, default='custom', help='dataset type')
+    parser.add_argument('--root_path', type=str, help='root path of the data file')
+    parser.add_argument('--data_path', type=str, help='data csv file')
+    parser.add_argument('--features', type=str, default='M',
+                        help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
+    parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
+    parser.add_argument('--freq', type=str, default='h',
+                        help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
+    parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+
+    # forecasting task
+    parser.add_argument('--seq_len', type=int, help='input sequence length')
+    parser.add_argument('--label_len', type=int, default=48, help='start token length') # no longer needed in inverted Transformers
+    parser.add_argument('--pred_len', type=int, help='prediction sequence length')
+
+    # model define
+    parser.add_argument('--n_layers', type=int, help='num of heads')
+    parser.add_argument('--dropout', type=float, help='dropout')
+    parser.add_argument('--mixer', action='store_true')
+    # parser.add_argument('--layernorm', action='store_true')
+
+    # optimization
+    parser.add_argument('--train_epochs', type=int, help='train epochs')
+    parser.add_argument('--weight_decay', type=float)
+    parser.add_argument('--batch_size', type=int, help='batch size of train input data')
+    parser.add_argument('--learning_rate', type=float, help='optimizer learning rate')
+    parser.add_argument('--loss_fn', type=str, help='options: [MSE, MAE]')
+
+    args = parser.parse_args()
+
+    args.patience = args.train_epochs
+
+    assert args.loss_fn in ['MSE', 'MAE'], 'Loss function not recognized'
+
+    if args.data_path in ['traffic.csv', 'ETTh1.csv', 'ETTh2.csv', 'electricity.csv']:
+        args.period = 168
+    elif args.data_path in ['solar_AL.txt']:
+        args.period = 144
+        args.mixer = True
+    elif args.data_path in ['ETTm1.csv', 'ETTm2.csv']:
+        args.period = 96
+    else:
+        assert False, 'Data path not recognized'
+
+    print('Args in experiment:')
+    print(args)
+
+    Exp = Exp_Long_Term_Forecast
+
+    setting = f'{args.model_id}_{args.model}_sl{args.seq_len}_pl{args.pred_len}_nl{args.n_layers}' \
+        f'_lr{args.learning_rate}_bs{args.batch_size}_do{args.dropout}_wd{args.weight_decay}_loss{args.loss_fn}'
+
+    exp = Exp(args)
+    print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+    exp.train(setting)
+    print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+    exp.test(setting)
