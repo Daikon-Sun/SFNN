@@ -19,9 +19,13 @@ class Exp_Basic(object):
         self.device = self._acquire_device()
 
         train_data, train_loader = self._get_data(flag='train')
-        ma_train_data = ma(train_data.data_x, 2*self.args.period)
-        prv_avg = ma_train_data[:-2*self.args.period].flatten()
-        nxt_avg = ma_train_data[2*self.args.period:].flatten()
+        if self.args.data_path == 'ILI.csv':
+            fac = 1
+        else:
+            fac = 2
+        ma_train_data = ma(train_data.data_x, fac*self.args.period)
+        prv_avg = ma_train_data[:-fac*self.args.period].flatten()
+        nxt_avg = ma_train_data[fac*self.args.period:].flatten()
         pearson = stats.pearsonr(nxt_avg, prv_avg).statistic
         self.args.need_norm = (pearson >= 0.7)
         print(f'pearson: {pearson:.4f}')

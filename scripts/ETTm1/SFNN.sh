@@ -5,6 +5,15 @@ dataset=ETTm1
 for rid in {0..9} ; do
     for sl in 96 192 384 672 1344 ; do
         for pl in 96 192 336 720 ; do
+            if [ $pl -eq 96 ] ; then
+                wd=0.0000
+            elif [ $pl -eq 192 ] ; then
+                wd=0.0003
+            elif [ $pl -eq 336 ] ; then
+                wd=0.0006
+            elif [ $pl -eq 720 ] ; then
+                wd=0.0009
+            fi
             python -u run.py \
               --root_path ./dataset/"$datapath"/ \
               --data_path "$dataset".csv \
@@ -16,7 +25,7 @@ for rid in {0..9} ; do
               --n_layers 2 \
               --batch_size 256 \
               --train_epochs 100 \
-              --weight_decay 0 \
+              --weight_decay $wd \
               --dropout 0.5 \
               --loss_fn MAE \
               --learning_rate 0.0005

@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 from torch import optim
 import os
-import time
 import warnings
 import numpy as np
 
@@ -61,8 +60,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        time_now = time.time()
-
         train_steps = len(train_loader)
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
@@ -70,22 +67,22 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             criterion = nn.MSELoss()
         elif self.args.loss_fn == 'MAE':
             criterion = nn.L1Loss()
-        model_optim = optim.Adam(
+        opt = optim.Adam(
             self.model.parameters(),
             lr=self.args.learning_rate,
             weight_decay=self.args.weight_decay
         )
-        sch = optim.lr_scheduler.StepLR(model_optim, 2, 0.85)
+        if self.args.data_path == 'ILI.csv':
+            sch = optim.lr_scheduler.StepLR(opt, 1, 0.7)
+        else:
+            sch = optim.lr_scheduler.StepLR(opt, 1, 0.85)
 
-        for epoch in range(self.args.train_epochs):
-            iter_count = 0
+        for epoch in range(1, self.args.train_epochs+1):
             train_loss = []
 
             self.model.train()
-            epoch_time = time.time()
             for i, (batch_x, batch_y) in enumerate(train_loader):
-                iter_count += 1
-                model_optim.zero_grad()
+                opt.zero_grad()
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
 
@@ -96,20 +93,16 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 loss = criterion(outputs, batch_y)
                 train_loss.append(loss.item())
 
-                if (i + 1) % 1000 == 0:
-                    print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
-                    speed = (time.time() - time_now) / iter_count
-                    left_time = speed * ((self.args.train_epochs - epoch) * train_steps - i)
-                    print('\tspeed: {:.4f}s/iter; left time: {:.4f}s'.format(speed, left_time))
-                    iter_count = 0
-                    time_now = time.time()
-
                 loss.backward()
-                model_optim.step()
+                opt.step()
 
             sch.step()
+            if self.args.data_path == 'ILI.csv':
+                if epoch % 10 == 0:
+                    opt.param_groups[0]['lr'] = self.args.learning_rate * 0.7**(epoch//10)
+            if opt.param_groups[0]['lr'] < 5e-5:
+                opt.param_groups[0]['lr'] = 5e-5
 
-            print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
             vali_mse_loss, vali_mae_loss = self.vali(vali_data, vali_loader)
             test_mse_loss, test_mae_loss = self.vali(test_data, test_loader)
@@ -118,12 +111,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             elif self.args.loss_fn == 'MAE':
                 vali_loss = vali_mae_loss
 
-            print("Epoch: {0} | Train Loss {1:.5f} | Vali Loss {2:.5f} | Test MSE {3:.5f} MAE {4:.5f}".format(epoch + 1, train_loss, vali_loss, test_mse_loss, test_mae_loss))
+            print("Epoch: {0} | Train Loss {1:.5f} | Vali Loss {2:.5f} | Test MSE {3:.5f} MAE {4:.5f}".format(epoch, train_loss, vali_loss, test_mse_loss, test_mae_loss))
             early_stopping(vali_loss, self.model, path)
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-
 
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))

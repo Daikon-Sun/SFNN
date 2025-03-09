@@ -49,11 +49,12 @@ if __name__ == '__main__':
 
     if args.data_path in ['traffic.csv', 'ETTh1.csv', 'ETTh2.csv', 'electricity.csv']:
         args.period = 168
-    elif args.data_path in ['solar_AL.txt']:
+    elif args.data_path in ['solar.csv', 'weather.csv']:
         args.period = 144
-        args.mixer = True
     elif args.data_path in ['ETTm1.csv', 'ETTm2.csv']:
         args.period = 96
+    elif args.data_path in ['ILI.csv']:
+        args.period = 52
     else:
         assert False, 'Data path not recognized'
 
