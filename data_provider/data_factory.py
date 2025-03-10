@@ -8,7 +8,9 @@ data_dict = {
     'ETTm2': Dataset_ETT_minute,
     'ILI': Dataset_Custom,
     'solar': Dataset_Solar,
-    'traffic': Dataset_Custom
+    'traffic': Dataset_Custom,
+    'weather': Dataset_Custom,
+    'electricity': Dataset_Custom
 }
 
 
