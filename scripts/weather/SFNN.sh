@@ -14,9 +14,10 @@ for rid in {0..9} ; do
               --seq_len $sl \
               --pred_len $pl \
               --n_layers 1 \
+              --mixer \
               --batch_size 256 \
-              --train_epochs 50 \
-              --weight_decay 0.0005 \
+              --train_epochs 100 \
+              --weight_decay 0.0009 \
               --dropout 0.05 \
               --loss_fn MSE \
               --learning_rate 0.001

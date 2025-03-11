@@ -16,8 +16,8 @@ for rid in {0..9} ; do
               --n_layers 2 \
               --batch_size 256 \
               --train_epochs 100 \
-              --weight_decay 0.0003 \
-              --dropout 0.7 \
+              --weight_decay 0.0001 \
+              --dropout 0.5 \
               --loss_fn MAE \
               --learning_rate 0.0005
         done

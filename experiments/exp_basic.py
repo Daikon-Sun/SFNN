@@ -23,10 +23,11 @@ class Exp_Basic(object):
         prv_avg = ma_train_data[:-2*self.args.period].flatten()
         nxt_avg = ma_train_data[2*self.args.period:].flatten()
         pearson = stats.pearsonr(nxt_avg, prv_avg).statistic
-        self.args.need_norm = (pearson >= 0.85) or (self.args.data_path == 'ILI.csv')
+        self.args.need_norm = (pearson >= 0.7) or (self.args.data_path == 'ILI.csv')
         self.args.n_series = train_data.data_x.shape[1]
         print(f'pearson: {pearson:.4f}, need_norm: {self.args.need_norm}')
 
+        ma_train_data = ma(train_data.data_x, self.args.period)
         avg_std = ma_train_data.std(axis=-1).mean()
         self.args.layernorm = (avg_std >= 0.5)
         print(f'avg_std: {avg_std:.4f}, layernorm: {self.args.layernorm}')
