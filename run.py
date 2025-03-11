@@ -36,14 +36,13 @@ if __name__ == '__main__':
 
     # optimization
     parser.add_argument('--train_epochs', type=int, help='train epochs')
+    parser.add_argument('--patience', type=int, default=30)
     parser.add_argument('--weight_decay', type=float)
     parser.add_argument('--batch_size', type=int, help='batch size of train input data')
     parser.add_argument('--learning_rate', type=float, help='optimizer learning rate')
     parser.add_argument('--loss_fn', type=str, help='options: [MSE, MAE]')
 
     args = parser.parse_args()
-
-    args.patience = args.train_epochs
 
     assert args.loss_fn in ['MSE', 'MAE'], 'Loss function not recognized'
 
