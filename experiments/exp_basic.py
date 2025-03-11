@@ -19,17 +19,17 @@ class Exp_Basic(object):
         self.device = self._acquire_device()
 
         train_data, train_loader = self._get_data(flag='train')
-        if self.args.data_path == 'ILI.csv':
-            fac = 1
-        else:
-            fac = 2
-        ma_train_data = ma(train_data.data_x, fac*self.args.period)
-        prv_avg = ma_train_data[:-fac*self.args.period].flatten()
-        nxt_avg = ma_train_data[fac*self.args.period:].flatten()
+        ma_train_data = ma(train_data.data_x, 2*self.args.period)
+        prv_avg = ma_train_data[:-2*self.args.period].flatten()
+        nxt_avg = ma_train_data[2*self.args.period:].flatten()
         pearson = stats.pearsonr(nxt_avg, prv_avg).statistic
-        self.args.need_norm = (pearson >= 0.7)
-        print(f'pearson: {pearson:.4f}')
+        self.args.need_norm = (pearson >= 0.85) or (self.args.data_path == 'ILI.csv')
         self.args.n_series = train_data.data_x.shape[1]
+        print(f'pearson: {pearson:.4f}, need_norm: {self.args.need_norm}')
+
+        avg_std = ma_train_data.std(axis=-1).mean()
+        self.args.layernorm = (avg_std >= 0.5)
+        print(f'avg_std: {avg_std:.4f}, layernorm: {self.args.layernorm}')
 
         self.model = self._build_model().to(self.device)
         n_para = sum(p.numel() for p in self.model.parameters())

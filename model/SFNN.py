@@ -9,6 +9,7 @@ class Model(nn.Module):
 
         self.need_norm  = configs.need_norm
         self.mixer = configs.mixer
+        self.layernorm = configs.layernorm
 
         self.period = configs.period
         self.dropout = nn.Dropout(configs.dropout)
@@ -18,7 +19,7 @@ class Model(nn.Module):
         if self.mixer:
             self.layers2 = nn.ModuleList([nn.Linear(configs.n_series, configs.n_series) for _ in range(configs.n_layers)])
 
-        if not self.mixer and self.need_norm:
+        if self.layernorm:
             self.layer_norms = nn.ModuleList([nn.LayerNorm([configs.n_series, configs.seq_len]) for _ in range(configs.n_layers)])
 
         self.out_proj = nn.Linear(configs.seq_len, configs.pred_len)
@@ -35,7 +36,7 @@ class Model(nn.Module):
                 x = x.transpose(1, -1)
                 x = F.selu(self.layers2[i](self.dropout(x))) + x
                 x = x.transpose(1, -1)
-            if not self.mixer and self.need_norm:
+            if self.layernorm:
                 x = self.layer_norms[i](x)
         x = self.out_proj(x)
         x = x.transpose(1, -1)
