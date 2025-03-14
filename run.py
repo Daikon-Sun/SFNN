@@ -32,7 +32,9 @@ if __name__ == '__main__':
     parser.add_argument('--n_layers', type=int, help='num of heads')
     parser.add_argument('--dropout', type=float, help='dropout')
     parser.add_argument('--mixer', action='store_true')
-    # parser.add_argument('--layernorm', action='store_true')
+    parser.add_argument('--layernorm', type=int, choices=[0, 1])
+    parser.add_argument('--need_norm', type=int, choices=[0, 1])
+    parser.add_argument('--norm_len', type=int)
 
     # optimization
     parser.add_argument('--train_epochs', type=int, help='train epochs')
@@ -40,13 +42,14 @@ if __name__ == '__main__':
     parser.add_argument('--weight_decay', type=float)
     parser.add_argument('--batch_size', type=int, help='batch size of train input data')
     parser.add_argument('--learning_rate', type=float, help='optimizer learning rate')
+    parser.add_argument('--min_lr', type=float, default=5e-5)
     parser.add_argument('--loss_fn', type=str, help='options: [MSE, MAE]')
 
     args = parser.parse_args()
 
     assert args.loss_fn in ['MSE', 'MAE'], 'Loss function not recognized'
 
-    if args.data_path in ['traffic.csv', 'ETTh1.csv', 'ETTh2.csv', 'electricity.csv']:
+    if args.data_path in ['ETTh1.csv', 'ETTh2.csv', 'traffic.csv', 'electricity.csv']:
         args.period = 168
     elif args.data_path in ['solar.csv', 'weather.csv']:
         args.period = 144
@@ -56,6 +59,9 @@ if __name__ == '__main__':
         args.period = 52
     else:
         assert False, 'Data path not recognized'
+
+    if args.norm_len is None:
+        args.norm_len = args.period
 
     print('Args in experiment:')
     print(args)

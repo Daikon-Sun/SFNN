@@ -10,8 +10,8 @@ class Model(nn.Module):
         self.need_norm  = configs.need_norm
         self.mixer = configs.mixer
         self.layernorm = configs.layernorm
+        self.norm_len = configs.norm_len
 
-        self.period = configs.period
         self.dropout = nn.Dropout(configs.dropout)
         self.inp_proj = nn.Linear(configs.seq_len, configs.seq_len)
         self.layers1 = nn.ModuleList([nn.Linear(configs.seq_len, configs.seq_len) for _ in range(configs.n_layers)])
@@ -26,7 +26,7 @@ class Model(nn.Module):
 
     def forward(self, x):
         if self.need_norm:
-            mean = x[:, -self.period:].mean(dim=1, keepdim=True)
+            mean = x[:, -self.norm_len:].mean(dim=1, keepdim=True)
             x = x - mean
         x = x.transpose(1, -1)
         x = self.inp_proj(x)

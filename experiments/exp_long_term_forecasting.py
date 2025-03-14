@@ -72,7 +72,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             lr=self.args.learning_rate,
             weight_decay=self.args.weight_decay
         )
-        if self.args.data_path == 'ILI.csv':
+        if self.args.data_path == 'ILI.csv' or self.args.data_path == 'traffic.csv':
             sch = optim.lr_scheduler.StepLR(opt, 1, 0.7)
         else:
             sch = optim.lr_scheduler.StepLR(opt, 1, 0.85)
@@ -100,8 +100,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             if self.args.data_path == 'ILI.csv':
                 if epoch % 10 == 0:
                     opt.param_groups[0]['lr'] = self.args.learning_rate * 0.7**(epoch//10)
-            if opt.param_groups[0]['lr'] < 5e-5:
-                opt.param_groups[0]['lr'] = 5e-5
+            if opt.param_groups[0]['lr'] < self.args.min_lr:
+                opt.param_groups[0]['lr'] = self.args.min_lr
 
             train_loss = np.average(train_loss)
             vali_mse_loss, vali_mae_loss = self.vali(vali_data, vali_loader)
