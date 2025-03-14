@@ -19,7 +19,8 @@ for rid in {0..9} ; do
               --weight_decay 0.00005 \
               --dropout 0.1 \
               --loss_fn MSE \
-              --learning_rate 0.0004
+              --learning_rate 0.0004 \
+              --min_lr 1e-5
         done
     done
 done
