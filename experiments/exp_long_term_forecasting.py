@@ -98,8 +98,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
             sch.step()
             if self.args.data_path == 'ILI.csv':
-                if epoch % 10 == 0:
-                    opt.param_groups[0]['lr'] = self.args.learning_rate * 0.7**(epoch//10)
+                if epoch % 12 == 0:
+                    opt.param_groups[0]['lr'] = self.args.learning_rate * 0.5**(epoch//12)
             if opt.param_groups[0]['lr'] < self.args.min_lr:
                 opt.param_groups[0]['lr'] = self.args.min_lr
 
