@@ -15,7 +15,7 @@ for rid in {0..9} ; do
               --pred_len $pl \
               --n_layers 2 \
               --mixer \
-              --batch_size 256 \
+              --batch_size 128 \
               --train_epochs 100 \
               --weight_decay 0.0005 \
               --dropout 0.4 \
