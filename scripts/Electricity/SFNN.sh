@@ -3,7 +3,7 @@ datapath=electricity
 dataset=electricity
 
 for rid in {0..9} ; do
-    for sl in 336 1344 168 672 ; do
+    for sl in 168 336 672 1344 ; do
         for pl in 96 192 336 720 ; do
             python -u run.py \
               --root_path ./dataset/"$datapath"/ \
@@ -17,7 +17,7 @@ for rid in {0..9} ; do
               --batch_size 16 \
               --train_epochs 100 \
               --weight_decay 0.00001 \
-              --dropout 0.2 \
+              --dropout 0.5 \
               --loss_fn MAE \
               --learning_rate 0.0005
         done

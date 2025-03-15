@@ -13,13 +13,13 @@ for rid in {0..9} ; do
               --data $dataset \
               --seq_len $sl \
               --pred_len $pl \
-              --n_layers 1 \
+              --n_layers 2 \
               --mixer \
               --batch_size 256 \
               --train_epochs 100 \
-              --weight_decay 0.0009 \
-              --dropout 0.05 \
-              --loss_fn MSE \
+              --weight_decay 0.0005 \
+              --dropout 0.4 \
+              --loss_fn MAE \
               --learning_rate 0.001
         done
     done
