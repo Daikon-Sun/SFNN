@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     # forecasting task
     parser.add_argument('--seq_len', type=int, help='input sequence length')
-    parser.add_argument('--label_len', type=int, default=48, help='start token length') # no longer needed in inverted Transformers
+    parser.add_argument('--label_len', type=int, default=1, help='start token length') # no longer needed in inverted Transformers
     parser.add_argument('--pred_len', type=int, help='prediction sequence length')
 
     # model define
@@ -57,6 +57,8 @@ if __name__ == '__main__':
         args.period = 96
     elif args.data_path in ['ILI.csv']:
         args.period = 52
+    elif args.data_path in ['exchange_rate.csv']:
+        args.period = 5
     else:
         assert False, 'Data path not recognized'
 
