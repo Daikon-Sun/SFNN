@@ -32,8 +32,7 @@ for rid in {0..9} ; do
               --pred_len $pl \
               --n_layers 2 \
               $mixer \
-              --need_norm 1\
-              --layernorm 1 \
+              --need_norm --layernorm \
               --batch_size $bs \
               --train_epochs 100 \
               --weight_decay $wd \

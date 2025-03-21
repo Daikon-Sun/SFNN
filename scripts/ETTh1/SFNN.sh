@@ -14,6 +14,7 @@ for rid in {0..9} ; do
               --seq_len $sl \
               --pred_len $pl \
               --n_layers 1 \
+              --need_norm --layernorm \
               --batch_size 64 \
               --train_epochs 50 \
               --weight_decay 0.001 \

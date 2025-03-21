@@ -32,8 +32,8 @@ if __name__ == '__main__':
     parser.add_argument('--n_layers', type=int, help='num of heads')
     parser.add_argument('--dropout', type=float, help='dropout')
     parser.add_argument('--mixer', action='store_true')
-    parser.add_argument('--layernorm', type=int, choices=[0, 1])
-    parser.add_argument('--need_norm', type=int, choices=[0, 1])
+    parser.add_argument('--layernorm', action='store_true')
+    parser.add_argument('--need_norm', action='store_true')
     parser.add_argument('--norm_len', type=int)
 
     # optimization

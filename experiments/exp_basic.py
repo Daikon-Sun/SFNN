@@ -5,13 +5,6 @@ import numpy as np
 from scipy import stats
 
 
-def ma(x, window):
-    cumsum = np.cumsum(x, axis=0)
-    result = np.empty((len(x) - window + 1, x.shape[1]))
-    result[0] = cumsum[window-1] / window
-    result[1:] = (cumsum[window:] - cumsum[:-window]) / window
-    return result
-
 class Exp_Basic(object):
     def __init__(self, args):
         self.args = args
@@ -20,23 +13,6 @@ class Exp_Basic(object):
 
         train_data, train_loader = self._get_data(flag='train')
         self.args.n_series = train_data.data_x.shape[1]
-
-        if self.args.need_norm is None:
-            ma_train_data = ma(train_data.data_x, 2*self.args.period)
-            prv_avg = ma_train_data[:-2*self.args.period].flatten()
-            nxt_avg = ma_train_data[2*self.args.period:].flatten()
-            pearson = stats.pearsonr(nxt_avg, prv_avg).statistic
-            self.args.need_norm = (pearson >= 0.7) or (self.args.data_path == 'ILI.csv')
-            self.args.n_series = train_data.data_x.shape[1]
-            print(f'pearson: {pearson:.4f}')
-        print(f'need_norm: {self.args.need_norm}')
-
-        if self.args.layernorm is None:
-            ma_train_data = ma(train_data.data_x, self.args.period)
-            avg_std = ma_train_data.std(axis=-1).mean()
-            self.args.layernorm = (avg_std >= 0.5)
-            print(f'avg_std: {avg_std:.4f}')
-        print(f'layernorm: {self.args.layernorm}')
 
         self.model = self._build_model().to(self.device)
         n_para = sum(p.numel() for p in self.model.parameters())

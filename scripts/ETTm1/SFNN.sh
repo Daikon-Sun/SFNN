@@ -23,6 +23,7 @@ for rid in {0..9} ; do
               --seq_len $sl \
               --pred_len $pl \
               --n_layers 2 \
+              --need_norm --layernorm \
               --norm_len 0 \
               --batch_size 256 \
               --train_epochs 200 \

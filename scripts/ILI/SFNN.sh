@@ -5,6 +5,15 @@ dataset=ILI
 for rid in {0..9} ; do
     for sl in 52 104 208 ; do
         for pl in 24 36 48 60 ; do
+            if [ $pl -eq 24 ] ; then
+                mixer="--mixer"
+            elif [ $pl -eq 36 ] ; then
+                mixer="--mixer"
+            elif [ $pl -eq 48 ] ; then
+                mixer=""
+            elif [ $pl -eq 60 ] ; then
+                mixer=""
+            fi
             python -u run.py \
               --root_path ./dataset/"$datapath"/ \
               --data_path "$dataset".csv \
@@ -14,7 +23,8 @@ for rid in {0..9} ; do
               --seq_len $sl \
               --pred_len $pl \
               --n_layers 1 \
-              --mixer \
+              $mixer \
+              --need_norm \
               --batch_size 2 \
               --train_epochs 200 \
               --patience 100 \

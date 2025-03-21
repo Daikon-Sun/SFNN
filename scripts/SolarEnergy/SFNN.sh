@@ -28,6 +28,7 @@ for rid in {0..9} ; do
               --pred_len $pl \
               --n_layers 3 \
               --mixer \
+              --need_norm \
               --batch_size $bs \
               --train_epochs 150 \
               --weight_decay $wd \
