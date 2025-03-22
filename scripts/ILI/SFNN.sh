@@ -10,7 +10,7 @@ for rid in {0..9} ; do
             elif [ $pl -eq 36 ] ; then
                 mixer="--mixer"
             elif [ $pl -eq 48 ] ; then
-                mixer=""
+                mixer="--mixer"
             elif [ $pl -eq 60 ] ; then
                 mixer=""
             fi
