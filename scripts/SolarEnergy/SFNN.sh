@@ -27,14 +27,15 @@ for rid in {0..9} ; do
               --seq_len $sl \
               --pred_len $pl \
               --n_layers 3 \
-              --mixer \
               --need_norm \
+              --mixer \
               --batch_size $bs \
               --train_epochs 150 \
               --weight_decay $wd \
               --dropout $dr \
               --loss_fn $lf \
-              --learning_rate $lr
+              --learning_rate $lr \
+              --min_lr 5e-5
         done
     done
 done
